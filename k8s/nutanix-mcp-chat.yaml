@@ -1,0 +1,74 @@
+# app.py（Streamlit）＋ 公式 Nutanix MCP Server を NKP で動かす
+# 事前に Secret（Prism の接続情報）を作っておくこと：README 参照
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nutanix-mcp
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nutanix-mcp-chat-config
+  namespace: nutanix-mcp
+data:
+  LLM_BASE_URL: "http://10.54.116.105:11434/v1"   # Ollama（環境に合わせて書き換える）
+  LLM_MODEL: "qwen2.5:7b"
+  PC_PORT: "9440"
+  PC_INSECURE: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nutanix-mcp-chat
+  namespace: nutanix-mcp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nutanix-mcp-chat
+  template:
+    metadata:
+      labels:
+        app: nutanix-mcp-chat
+    spec:
+      containers:
+        - name: app
+          image: ghcr.io/tatsuhiro-matsumoto/nutanix-mcp-chat:0.2
+          ports:
+            - containerPort: 8501
+          envFrom:
+            - configMapRef:
+                name: nutanix-mcp-chat-config
+            - secretRef:
+                name: nutanix-pc            # PC_HOST / PC_USERNAME / PC_PASSWORD
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              memory: 1Gi
+          # 起動時に init で API 仕様を取るので 1 分ほどかかる。最大 3 分まで待つ
+          startupProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            periodSeconds: 10
+            failureThreshold: 18
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nutanix-mcp-chat
+  namespace: nutanix-mcp
+spec:
+  type: LoadBalancer
+  selector:
+    app: nutanix-mcp-chat
+  ports:
+    - port: 80
+      targetPort: 8501
