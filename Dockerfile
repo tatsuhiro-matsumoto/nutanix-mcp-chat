@@ -24,8 +24,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py .
 
-# root で動かさない
-RUN useradd --create-home app
+# root で動かさない（init で root が作ったログのフォルダを app に渡す）
+RUN useradd --create-home app \
+ && mkdir -p /tmp/nutanix-mcp-logs \
+ && chown -R app /tmp/nutanix-mcp-logs
 USER app
 
 # 接続先などは起動時に環境変数で渡す（Prism の接続情報はイメージに入れない）
