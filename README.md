@@ -87,4 +87,4 @@ LLM_MODEL=qwen3:8b streamlit run app.py --server.address 0.0.0.0
 
 ## ライセンス
 
-【ライセンスを記入（例：MIT）】
+[MIT License](LICENSE)
