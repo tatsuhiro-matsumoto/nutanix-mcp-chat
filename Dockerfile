@@ -14,6 +14,7 @@ RUN git clone --branch ${MCP_VERSION} --depth 1 https://github.com/nutanix/ntnx-
 
 # API 仕様ファイル（artifacts）をビルド時に取ってきて焼き込む
 # PC_HOST を設定しないので、開発者ポータルの最新版（latest_release モード）を取る
+# ※ 起動時に entrypoint.sh が PC に合わせて取り直す。これは失敗したときの予備
 ENV ARTIFACTS_DIR=/opt/ntnx-api-mcp-server/artifacts \
     LOG_DIR=/tmp/nutanix-mcp-logs
 RUN nutanix-mcp init
@@ -23,6 +24,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 COPY app.py .
+COPY --chmod=755 entrypoint.sh .
 
 # root で動かさない（init で root が作ったログのフォルダを app に渡す）
 RUN useradd --create-home app \
@@ -36,4 +38,4 @@ ENV MCP_DIR=/opt/ntnx-api-mcp-server \
     LLM_MODEL=qwen2.5:7b
 
 EXPOSE 8501
-CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501", "--server.headless=true"]
+ENTRYPOINT ["./entrypoint.sh"]
