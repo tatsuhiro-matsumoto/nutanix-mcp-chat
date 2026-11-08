@@ -20,7 +20,7 @@
 
 ## 動作確認した環境
 
-- Ubuntu 24.04 LTS（vCPU 8 / メモリ 16GB / GPUなし）
+- Ubuntu 26.04.1 LTS（vCPU 8 / メモリ 16GB / GPUなし）
 - Nutanix MCP Server v0.8（Technical Preview）
 - Ollama ＋ `qwen2.5:7b`
 

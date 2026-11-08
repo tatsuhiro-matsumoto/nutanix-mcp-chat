@@ -18,3 +18,5 @@ artifacts/
 .idea/
 .DS_Store
 Thumbs.db
+
+pc.env
