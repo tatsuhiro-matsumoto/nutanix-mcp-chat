@@ -66,9 +66,12 @@ metadata:
   name: nutanix-mcp-chat
   namespace: nutanix-mcp
 spec:
-  type: LoadBalancer
+  # 検証環境で LoadBalancer の IP が空いていないので NodePort で公開する
+  # → http://<ノードのIP>:30851/
+  type: NodePort
   selector:
     app: nutanix-mcp-chat
   ports:
-    - port: 80
+    - port: 8501
       targetPort: 8501
+      nodePort: 30851
