@@ -1,0 +1,20 @@
+# 認証情報（絶対にコミットしない）
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Nutanix MCP Server のログ・定義ファイル
+logs/
+artifacts/
+
+# エディタ・OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
