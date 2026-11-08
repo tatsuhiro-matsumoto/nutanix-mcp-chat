@@ -4,7 +4,10 @@
 # 失敗したら、イメージに焼き込んだ最新版（latest_release）をそのまま使う
 if [ -n "$PC_HOST" ] && [ "${INIT_ON_START:-true}" = "true" ]; then
   echo "[entrypoint] ${PC_HOST} に合わせて artifacts を取得します"
-  if (cd /opt/ntnx-api-mcp-server && ARTIFACTS_DIR=/tmp/artifacts nutanix-mcp init); then
+  # init は最後に設定を .env としてカレントフォルダに保存する（パスワードも入る）ので、
+  # 消えてもいい作業用フォルダで動かす
+  mkdir -p /tmp/nutanix-mcp-work
+  if (cd /tmp/nutanix-mcp-work && ARTIFACTS_DIR=/tmp/artifacts nutanix-mcp init); then
     export ARTIFACTS_DIR=/tmp/artifacts
   else
     echo "[entrypoint] 取得に失敗したので、イメージ内の artifacts を使います"
